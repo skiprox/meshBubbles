@@ -1,7 +1,7 @@
 #include "ofApp.h"
 
 #define LINE_SIZE 300
-#define FRAMERATE 24
+#define FRAMERATE 48
 
 //--------------------------------------------------------------
 void ofApp::setup(){
@@ -72,6 +72,8 @@ void ofApp::update(){
 		ekgLines.erase(ekgLines.begin() + i);
 		ekgLinesSaved.erase(ekgLinesSaved.begin() + i);
 	}
+	// Ease all the values
+	easeAllValues();
 	// Update the Z values and the colors
 	updateZValue();
 	updateColors();
@@ -85,6 +87,48 @@ void ofApp::draw(){
     ofDisableDepthTest();
     cam.end();
     gui.draw();
+}
+
+//--------------------------------------------------------------
+void ofApp::easeAllValues(){
+	//int lineActionIncrementer = ofGetFrameNum() % lineActionFrequency;
+	//cout << lineActionIncrementer << endl;
+	int rowsColsVal = LINE_SIZE;
+	for (int i = 0; i < rowsColsVal; i++) {
+		// If we can find a non-zero value in the row,
+		// then we know we have a row with action points
+		if (ekgLinesSaved[i * rowsColsVal] != 0.0) {
+			// Loop through once and ease all values in the row
+			for (int j = 0; j < rowsColsVal; j++) {
+				// This will be an action point
+				if (j % actionPointsDistance == 0) {
+					for (int x = 0; x < actionPointsDistance; x++) {
+						int pointToEase = (i * rowsColsVal + j) + x;
+						if (pointToEase >= 0 && pointToEase <= ekgLines.size()) {
+							float easedValue = easeInOutQuad((x % (actionPointsDistance))/(float)(actionPointsDistance));
+							float mappedValue = ofMap(easedValue, 0.0, 1.0, ekgLinesSaved[i * rowsColsVal + j], ekgLinesSaved[i * rowsColsVal + j + actionPointsDistance]);
+							ekgLines[pointToEase] = mappedValue;
+						}
+					}
+				}
+			}
+			// loop through again, easing all values in other rows
+			for (int j = 0; j < rowsColsVal; j++) {
+				// For every point in this row,
+				// we want to ease the values around it in other rows
+				for (int x = 0; x < lineActionFrequency; x++) {
+					// pointToEase is the ekgLines index to ease
+					int pointToEase = (i * rowsColsVal + j) + (x * rowsColsVal);
+					// If the pointToEase is within our ekgLines vector
+					if (pointToEase >= 0 && pointToEase <= ekgLines.size()) {
+						float easedValue = easeInOutQuad((x % (lineActionFrequency))/(float)(lineActionFrequency));
+						float mappedValue = ofMap(easedValue, 0.0, 1.0, ekgLines[i * rowsColsVal + j], ekgLines[i * rowsColsVal + j + (lineActionFrequency * rowsColsVal)]);
+						ekgLines[pointToEase] = mappedValue;
+					}
+				}
+			}
+		}
+	}
 }
 
 //--------------------------------------------------------------

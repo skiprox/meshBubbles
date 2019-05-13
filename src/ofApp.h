@@ -11,6 +11,7 @@ class ofApp : public ofBaseApp{
 		void update();
 		void draw();
 
+		void easeAllValues();
 		void updateZValue();
 		void updateColors();
 
@@ -25,8 +26,8 @@ class ofApp : public ofBaseApp{
 		vector<float> ekgLines;
 		vector<float> ekgLinesSaved;
 		// How often we have a line that has random values
-		int lineActionFrequency = 50;
+		int lineActionFrequency = 30;
 		// Distance between random values in a given line
-		int actionPointsDistance = 50;
+		int actionPointsDistance = 30;
 		
 };
