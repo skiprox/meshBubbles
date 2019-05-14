@@ -23,6 +23,10 @@ class ofApp : public ofBaseApp{
 		ofxPanel gui;
     	ofParameter<ofColor> colorNear;
     	ofParameter<ofColor> colorFar;
+    	ofParameter<float> noiseAmp;
+    	ofParameter<float> frameMultiplier;
+    	ofParameter<float> noiseMultiplier;
+    	ofParameter<float> noiseScale;
 		vector<float> ekgLines;
 		vector<float> ekgLinesSaved;
 		// How often we have a line that has random values

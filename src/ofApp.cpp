@@ -1,13 +1,17 @@
 #include "ofApp.h"
 
 #define LINE_SIZE 300
-#define FRAMERATE 48
+#define FRAMERATE 60
 
 //--------------------------------------------------------------
 void ofApp::setup(){
 	ofBackground(0);
 	ofSetFrameRate(FRAMERATE);
 	gui.setup();
+	gui.add(noiseAmp.set("Noise Amp", 100.0, 0.0, 200.0));
+	gui.add(noiseScale.set("Noise Scale", 0.1, 0.0, 10.0));
+	gui.add(frameMultiplier.set("Frame Multiplier", 0.5, 0.0, 2.0));
+	gui.add(noiseMultiplier.set("Noise Multiplier", 5.0, 0.0, 10.0));
 	gui.add(colorNear.set("Color Near", ofColor(101, 114, 235), ofColor(0,0,0), ofColor(255,255,255)));
 	gui.add(colorFar.set("Color Far", ofColor(203, 255, 181), ofColor(0,0,0), ofColor(255,255,255)));
 	float width = ofGetWidth();
@@ -71,6 +75,14 @@ void ofApp::update(){
 	for (int i = 0; i < LINE_SIZE; i++) {
 		ekgLines.erase(ekgLines.begin() + i);
 		ekgLinesSaved.erase(ekgLinesSaved.begin() + i);
+	}
+	// update all action values with noise
+	for (int i = 0; i < ekgLines.size(); i++) {
+		if (ekgLinesSaved[i] != 0.0) {
+			// float signedNoise = ofSignedNoise(i * noiseScale, ofGetFrameNum() * frameMultiplier, ekgLinesSaved[i]/100.0) * noiseMultiplier;
+			// ekgLines[i] += signedNoise;
+			// ekgLinesSaved[i] += signedNoise;
+		}
 	}
 	// Ease all the values
 	easeAllValues();
