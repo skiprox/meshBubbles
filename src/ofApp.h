@@ -23,12 +23,12 @@ class ofApp : public ofBaseApp{
 		ofxPanel gui;
     	ofParameter<ofColor> colorNear;
     	ofParameter<ofColor> colorFar;
-    	ofParameter<float> noiseAmp;
-    	ofParameter<float> frameMultiplier;
+    	ofParameter<float> noiseFreq;
     	ofParameter<float> noiseMultiplier;
     	ofParameter<float> noiseScale;
 		vector<float> ekgLines;
 		vector<float> ekgLinesSaved;
+		vector<float> ekgLinesStable;
 		// How often we have a line that has random values
 		int lineActionFrequency = 30;
 		// Distance between random values in a given line

@@ -8,10 +8,9 @@ void ofApp::setup(){
 	ofBackground(0);
 	ofSetFrameRate(FRAMERATE);
 	gui.setup();
-	gui.add(noiseAmp.set("Noise Amp", 100.0, 0.0, 200.0));
-	gui.add(noiseScale.set("Noise Scale", 0.1, 0.0, 10.0));
-	gui.add(frameMultiplier.set("Frame Multiplier", 0.5, 0.0, 2.0));
+	gui.add(noiseScale.set("Noise Scale", 0.01, 0.0, 0.05));
 	gui.add(noiseMultiplier.set("Noise Multiplier", 5.0, 0.0, 10.0));
+	gui.add(noiseFreq.set("Noise Frequency", 0.5, 0.0, 1.0));
 	gui.add(colorNear.set("Color Near", ofColor(101, 114, 235), ofColor(0,0,0), ofColor(255,255,255)));
 	gui.add(colorFar.set("Color Far", ofColor(203, 255, 181), ofColor(0,0,0), ofColor(255,255,255)));
 	float width = ofGetWidth();
@@ -47,6 +46,7 @@ void ofApp::setup(){
 	for (int i = 0; i < mesh.getVertices().size(); i++) {
 		ekgLines.push_back(0.0);
 		ekgLinesSaved.push_back(0.0);
+		ekgLinesStable.push_back(0.0);
 	}
 }
 
@@ -60,28 +60,45 @@ void ofApp::update(){
 				float ran = ofRandom(-100.0, 100.0);
 				ekgLines.push_back(ran);
 				ekgLinesSaved.push_back(ran);
+				ekgLinesStable.push_back(ran);
 			} else {
 				ekgLines.push_back(0.0);
 				ekgLinesSaved.push_back(0.0);
+				ekgLinesStable.push_back(0.0);
 			}
 		}
 	} else {
 		for (int i = 0; i < LINE_SIZE; i++) {
 			ekgLines.push_back(0.0);
 			ekgLinesSaved.push_back(0.0);
+			ekgLinesStable.push_back(0.0);
 		}
 	}
 	// Delete one row
 	for (int i = 0; i < LINE_SIZE; i++) {
 		ekgLines.erase(ekgLines.begin() + i);
 		ekgLinesSaved.erase(ekgLinesSaved.begin() + i);
+		ekgLinesStable.erase(ekgLinesStable.begin() + i);
 	}
 	// update all action values with noise
 	for (int i = 0; i < ekgLines.size(); i++) {
 		if (ekgLinesSaved[i] != 0.0) {
-			// float signedNoise = ofSignedNoise(i * noiseScale, ofGetFrameNum() * frameMultiplier, ekgLinesSaved[i]/100.0) * noiseMultiplier;
-			// ekgLines[i] += signedNoise;
-			// ekgLinesSaved[i] += signedNoise;
+			float noise = ofSignedNoise ( mesh.getVertices()[i].x * noiseScale,    // x pos
+	                        mesh.getVertices()[i].y * noiseScale,    // y pos
+	                        ofGetElapsedTimef() * noiseFreq    // time (z) to animate
+	                       ) * noiseMultiplier;
+			//ekgLines[i] += noise;
+			ekgLinesSaved[i] += noise;
+			ekgLinesStable[i] += noise;
+		}
+	}
+	// Animate the random high/low points to swing up towards the center,
+	// and back down towards the end
+	for (int i = 0; i < ekgLines.size(); i++) {
+		if (ekgLinesSaved[i] != 0.0) {
+			int row = (int)i/LINE_SIZE;
+			float lerpValue = ofMap(abs((float)row - (float)LINE_SIZE/2.0), 0.0, (float)LINE_SIZE/2.0, ekgLinesStable[i], 0.0);
+			ekgLinesSaved[i] = lerpValue;
 		}
 	}
 	// Ease all the values
