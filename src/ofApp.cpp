@@ -1,5 +1,9 @@
 #include "ofApp.h"
+#include "rtl-sdr.h"
 
+#define FREQUENCY (107.7 * 1000000)
+#define SAMPLE_RATE 900001
+#define BYTES_TO_READ (0xFFFF + 1)
 #define LINE_SIZE 300
 #define FRAMERATE 60
 
@@ -11,12 +15,27 @@ void ofApp::setup(){
 	gui.add(noiseScale.set("Noise Scale", 0.01, 0.0, 0.05));
 	gui.add(noiseMultiplier.set("Noise Multiplier", 5.0, 0.0, 10.0));
 	gui.add(noiseFreq.set("Noise Frequency", 0.5, 0.0, 1.0));
-	gui.add(colorNear.set("Color Near", ofColor(101, 114, 235), ofColor(0,0,0), ofColor(255,255,255)));
-	gui.add(colorFar.set("Color Far", ofColor(203, 255, 181), ofColor(0,0,0), ofColor(255,255,255)));
+	gui.add(colorNear.set("Color Near", ofColor(101, 114, 235, 255), ofColor(0,0,0, 255), ofColor(255,255,255,255)));
+	gui.add(colorFar.set("Color Far", ofColor(203, 255, 181, 255), ofColor(0,0,0, 255), ofColor(255,255,255,255)));
+	// Setup RTL SDR
+	int deviceCount = rtlsdr_get_device_count();
+	cout << "RTL Device Count: " << deviceCount << endl;
+	// setup the rtl sdr dongle
+	if (deviceCount > 0) {
+		std::cout << std::endl << "Opening device 0." << std::endl;
+		std::cout << "(RET) rtlsdr_open = " << rtlsdr_open(&device, 0) << std::endl;
+		std::cout << "(RET) rtlsdr_set_freq_correction = " << rtlsdr_set_freq_correction(device, 68) << std::endl;
+		std::cout << "(RET) rtlsdr_set_center_freq = " << rtlsdr_set_center_freq(device, FREQUENCY) << std::endl;
+		std::cout << "(RET) relsdr_set_sample_rate = " << rtlsdr_set_sample_rate(device, SAMPLE_RATE) << std::endl;
+		std::cout << "(RET) rtlsdr_reset_buffer = " << rtlsdr_reset_buffer(device) << std::endl;
+	} else {
+		ofExit();
+	}
+	// Store references to width and height
 	float width = ofGetWidth();
 	float height = ofGetHeight();
-	int rowsColsVal = LINE_SIZE;
 	// Create the mesh
+	int rowsColsVal = LINE_SIZE;
 	for (int c = 0; c<rowsColsVal; c++){
 	    for (int r = 0; r<rowsColsVal; r++){
 	        glm::vec3 pos;      // grid centered at 0,0,0
@@ -55,12 +74,33 @@ void ofApp::update(){
 	// Create one new row,
 	// but check if it's an action row or not
 	if (ofGetFrameNum() % lineActionFrequency == 0) {
+		// Get the latest info from the rtl sdr
+		// Read sync
+		rtlsdr_read_sync(device, buffer, BYTES_TO_READ, &bytesRead);
+		// reset these variables to 0
+		iIdx = 0;
+		qIdx = 0;
+		// Construct the phase data array
+		for (int i = 0; i < 20 * 2 + 2; i += 2) {
+			iData[iIdx++] = buffer[i];
+			qData[qIdx++] = buffer[i + 1];
+		}
+		for (int i = 0; i < 20 + 2; ++i) {
+			phaseData[i] = atan2(iData[i], qData[i]);
+		}
+		// Construct the phase data difference double,
+		// to use in our ekgLines vector
+		for (int i = 0; i < 20; i++) {
+			phaseDataDifference[i] = (phaseData[i] - phaseData[i + 1]) * 1000.f;
+		}
+		updateIncrementer = 0;
 		for (int i = 0; i < LINE_SIZE; i++) {
 			if (i % actionPointsDistance == 0) {
-				float ran = ofRandom(-100.0, 100.0);
-				ekgLines.push_back(ran);
-				ekgLinesSaved.push_back(ran);
-				ekgLinesStable.push_back(ran);
+				cout << "THE PHASE DIFFERENCE: " << phaseDataDifference[updateIncrementer] << endl;
+				ekgLines.push_back(phaseDataDifference[updateIncrementer]);
+				ekgLinesSaved.push_back(phaseDataDifference[updateIncrementer]);
+				ekgLinesStable.push_back(phaseDataDifference[updateIncrementer]);
+				updateIncrementer++;
 			} else {
 				ekgLines.push_back(0.0);
 				ekgLinesSaved.push_back(0.0);

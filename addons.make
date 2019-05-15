@@ -1,3 +1,4 @@
 ofxEasing
 ofxGui
 ofxXmlSettings
+-lrtlsdr
