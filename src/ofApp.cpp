@@ -96,7 +96,7 @@ void ofApp::update(){
 		updateIncrementer = 0;
 		for (int i = 0; i < LINE_SIZE; i++) {
 			if (i % actionPointsDistance == 0) {
-				cout << "THE PHASE DIFFERENCE: " << phaseDataDifference[updateIncrementer] << endl;
+				// cout << "THE PHASE DIFFERENCE: " << phaseDataDifference[updateIncrementer] << endl;
 				ekgLines.push_back(phaseDataDifference[updateIncrementer]);
 				ekgLinesSaved.push_back(phaseDataDifference[updateIncrementer]);
 				ekgLinesStable.push_back(phaseDataDifference[updateIncrementer]);
