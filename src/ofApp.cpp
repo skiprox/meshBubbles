@@ -7,12 +7,14 @@
 void ofApp::setup(){
 	ofBackground(0);
 	ofSetFrameRate(FRAMERATE);
+	ofEnableAlphaBlending();
 	gui.setup();
+	gui.add(drawWires.set("Draw Wireframes", false, true, false));
 	gui.add(noiseScale.set("Noise Scale", 0.01, 0.0, 0.05));
 	gui.add(noiseMultiplier.set("Noise Multiplier", 5.0, 0.0, 10.0));
 	gui.add(noiseFreq.set("Noise Frequency", 0.5, 0.0, 1.0));
-	gui.add(colorNear.set("Color Near", ofColor(101, 114, 235), ofColor(0,0,0), ofColor(255,255,255)));
-	gui.add(colorFar.set("Color Far", ofColor(203, 255, 181), ofColor(0,0,0), ofColor(255,255,255)));
+	gui.add(colorNear.set("Color Near", ofColor(101, 114, 235, 255), ofColor(0, 0, 0, 255), ofColor(255, 255, 255, 255)));
+	gui.add(colorFar.set("Color Far", ofColor(203, 255, 181, 255), ofColor(0, 0, 0, 255), ofColor(255, 255, 255, 255)));
 	float width = ofGetWidth();
 	float height = ofGetHeight();
 	int rowsColsVal = LINE_SIZE;
@@ -112,7 +114,11 @@ void ofApp::update(){
 void ofApp::draw(){
 	cam.begin();
     ofEnableDepthTest();
-    mesh.draw();
+    if (drawWires) {
+    	mesh.drawWireframe();
+    } else {
+    	mesh.draw();
+    }
     ofDisableDepthTest();
     cam.end();
     gui.draw();
