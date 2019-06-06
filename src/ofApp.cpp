@@ -152,7 +152,7 @@ void ofApp::update(){
 void ofApp::draw(){
 	cam.begin();
     ofEnableDepthTest();
-    mesh.draw();
+    mesh.drawWireframe();
     ofDisableDepthTest();
     cam.end();
     gui.draw();
