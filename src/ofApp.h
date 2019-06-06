@@ -32,6 +32,7 @@ class ofApp : public ofBaseApp{
 		ofEasyCam cam;
 		ofMesh mesh;
 		ofxPanel gui;
+		ofParameter<bool> drawWires;
     	ofParameter<ofColor> colorNear;
     	ofParameter<ofColor> colorFar;
     	ofParameter<float> noiseFreq;

@@ -12,6 +12,7 @@ void ofApp::setup(){
 	ofBackground(0);
 	ofSetFrameRate(FRAMERATE);
 	gui.setup();
+	gui.add(drawWires.set("Draw Wireframes", false, false, true));
 	gui.add(noiseScale.set("Noise Scale", 0.01, 0.0, 0.05));
 	gui.add(noiseMultiplier.set("Noise Multiplier", 5.0, 0.0, 10.0));
 	gui.add(noiseFreq.set("Noise Frequency", 0.5, 0.0, 1.0));
@@ -152,7 +153,11 @@ void ofApp::update(){
 void ofApp::draw(){
 	cam.begin();
     ofEnableDepthTest();
-    mesh.drawWireframe();
+    if (drawWires) {
+    	mesh.drawWireframe();
+    } else {
+    	mesh.draw();
+    }
     ofDisableDepthTest();
     cam.end();
     gui.draw();
