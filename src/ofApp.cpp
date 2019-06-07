@@ -160,7 +160,16 @@ void ofApp::easeAllValues(){
 					// If the pointToEase is within our ekgLines vector
 					if (pointToEase >= 0 && pointToEase <= ekgLines.size()) {
 						float easedValue = easeInOutQuad((x % (lineActionFrequency))/(float)(lineActionFrequency));
-						float mappedValue = ofMap(easedValue, 0.0, 1.0, ekgLines[i * rowsColsVal + j], ekgLines[i * rowsColsVal + j + (lineActionFrequency * rowsColsVal)]);
+						int firstLinePoint = i * rowsColsVal + j;
+						int secondLinePoint = i * rowsColsVal + j + (lineActionFrequency * rowsColsVal);
+						float firstLineValue = ekgLines[firstLinePoint];
+						float secondLineValue;
+						if (secondLinePoint >= 0 && secondLinePoint <= ekgLines.size()) {
+							secondLineValue = ekgLines[secondLinePoint];
+						} else {
+							secondLineValue = 0.0;
+						}
+						float mappedValue = ofMap(easedValue, 0.0, 1.0, firstLineValue, secondLineValue);
 						ekgLines[pointToEase] = mappedValue;
 					}
 				}
