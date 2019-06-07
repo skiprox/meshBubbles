@@ -60,7 +60,10 @@ void ofApp::update(){
 		for (int i = 0; i < LINE_SIZE; i++) {
 			if (i % actionPointsDistance == 0) {
 				float ran = ofRandom(-100.0, 100.0);
-				ekgLines.push_back(ran);
+				// We push 0.0 to the back of ekgLines,
+				// bc we want to generate that based on the saved and stable
+				// values in the ekglines vectors
+				ekgLines.push_back(0.0);
 				ekgLinesSaved.push_back(ran);
 				ekgLinesStable.push_back(ran);
 			} else {
