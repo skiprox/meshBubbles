@@ -176,9 +176,7 @@ void ofApp::updateZValue(){
 
 // --------------------------------
 void ofApp::updateColors(){
-
     // map colors based on vertex z / depth
-
     for (int i = 0; i < mesh.getVertices().size(); i++){
         // 1 color per vertex
         glm::vec3& vertex = mesh.getVertices()[i];
