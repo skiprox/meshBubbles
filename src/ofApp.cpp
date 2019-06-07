@@ -201,5 +201,4 @@ float ofApp::easeInOutQuad(float t) {
 	} else {
 		return (-1.0 + (4.0 - 2.0 * t) * t);
 	}
-
 }
