@@ -9,12 +9,19 @@ void ofApp::setup(){
 	ofSetFrameRate(FRAMERATE);
 	ofEnableAlphaBlending();
 	gui.setup();
-	gui.add(drawWires.set("Draw Wireframes", false, true, false));
-	gui.add(noiseScale.set("Noise Scale", 0.01, 0.0, 0.05));
-	gui.add(noiseMultiplier.set("Noise Multiplier", 5.0, 0.0, 10.0));
-	gui.add(noiseFreq.set("Noise Frequency", 0.5, 0.0, 1.0));
-	gui.add(colorNear.set("Color Near", ofColor(101, 114, 235, 255), ofColor(0, 0, 0, 255), ofColor(255, 255, 255, 255)));
-	gui.add(colorFar.set("Color Far", ofColor(203, 255, 181, 255), ofColor(0, 0, 0, 255), ofColor(255, 255, 255, 255)));
+	gui.add(drawWires.set("Draw Wireframes", true, true, false));
+	gui.add(noiseScale.set("Noise Scale", 0.00175, 0.0, 0.05));
+	gui.add(noiseMultiplier.set("Noise Multiplier", 4.38711, 0.0, 10.0));
+	gui.add(noiseFreq.set("Noise Frequency", 0.588711, 0.0, 1.0));
+	gui.add(camPositionX.set("Cam Position X", -2.84632, -ofGetWidth(), ofGetWidth()));
+	gui.add(camPositionY.set("Cam Position Y", 171.168, -ofGetHeight(), ofGetHeight()));
+	gui.add(camPositionZ.set("Cam Position Z", -271.795, -2400.0, 1200.0));
+	gui.add(camTargetX.set("Cam Target X", 0.0, -ofGetWidth(), ofGetWidth()));
+	gui.add(camTargetY.set("Cam Target Y", 0.0, -ofGetHeight(), ofGetHeight()));
+	gui.add(camTargetZ.set("Cam Target Z", 0.0, -16000.0, 24000.0));
+	gui.add(camDistance.set("Cam Distance", 404.913, 0.0, 1200.0));
+	gui.add(colorNear.set("Color Near", ofColor(0, 0, 0, 255), ofColor(0, 0, 0, 255), ofColor(255, 255, 255, 255)));
+	gui.add(colorFar.set("Color Far", ofColor(17, 255, 241, 255), ofColor(0, 0, 0, 255), ofColor(255, 255, 255, 255)));
 	float width = ofGetWidth();
 	float height = ofGetHeight();
 	int rowsColsVal = LINE_SIZE;
@@ -50,6 +57,10 @@ void ofApp::setup(){
 		ekgLinesSaved.push_back(0.0);
 		ekgLinesStable.push_back(0.0);
 	}
+	// camera overrides
+	cam.disableMouseInput();
+	// mouse overrides
+	ofHideCursor();
 }
 
 //--------------------------------------------------------------
@@ -115,6 +126,10 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+	// Set up where the cam is looking
+	cam.setPosition(ofPoint(camPositionX, camPositionY, camPositionZ));
+	cam.setTarget(glm::vec3(camTargetX, camTargetY, camTargetZ));
+	cam.setDistance(camDistance);
 	cam.begin();
     ofEnableDepthTest();
     if (drawWires) {
@@ -124,7 +139,7 @@ void ofApp::draw(){
     }
     ofDisableDepthTest();
     cam.end();
-    gui.draw();
+    // gui.draw();
 }
 
 //--------------------------------------------------------------
@@ -210,4 +225,15 @@ float ofApp::easeInOutQuad(float t) {
 	} else {
 		return (-1.0 + (4.0 - 2.0 * t) * t);
 	}
+}
+
+// --------------------------------
+void ofApp::keyReleased(int key){
+	ofNode target = cam.getTarget();
+	cout << "THE CAM POSITION " << cam.getPosition() << endl;
+	cout << "THE CAM TARGET " << target.getPosition() << endl;
+	cout << "THE CAM DISTANCE " << cam.getDistance() << endl;
+	cout << "THE CAM UP AXIS " << cam.getUpAxis() << endl;
+	cout << "THE CAM RELATIVE Y AXIS " << cam.getRelativeYAxis() << endl;
+	cout << "THE CAM TRANSLATION KEY " << cam.getTranslationKey() << endl;
 }

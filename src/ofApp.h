@@ -17,6 +17,8 @@ class ofApp : public ofBaseApp{
 
 		float easeInOutQuad(float t);
 
+		void keyReleased(int key);
+
 		// mesh stuff
 		ofEasyCam cam;
 		ofMesh mesh;
@@ -27,6 +29,13 @@ class ofApp : public ofBaseApp{
     	ofParameter<float> noiseFreq;
     	ofParameter<float> noiseMultiplier;
     	ofParameter<float> noiseScale;
+    	ofParameter<float> camPositionX;
+    	ofParameter<float> camPositionY;
+    	ofParameter<float> camPositionZ;
+    	ofParameter<float> camTargetX;
+    	ofParameter<float> camTargetY;
+    	ofParameter<float> camTargetZ;
+    	ofParameter<float> camDistance;
 		vector<float> ekgLines;
 		vector<float> ekgLinesSaved;
 		vector<float> ekgLinesStable;
