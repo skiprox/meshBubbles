@@ -162,7 +162,9 @@ void ofApp::draw(){
     }
     ofDisableDepthTest();
     cam.end();
-    gui.draw();
+    if (showGui) {
+      gui.draw();
+    }
 }
 
 //--------------------------------------------------------------
@@ -241,5 +243,13 @@ float ofApp::easeInOutQuad(float t) {
 	} else {
 		return (-1.0 + (4.0 - 2.0 * t) * t);
 	}
+}
 
+// --------------------------------
+void ofApp::keyReleased(int key){
+  // some extra keyboard commands:
+  if (key == 'h') {
+    // press f to toggle fullscreen / window mode
+    showGui = !showGui;
+  }
 }

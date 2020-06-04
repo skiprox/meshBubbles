@@ -14,6 +14,7 @@ class ofApp : public ofBaseApp{
 		void setup();
 		void update();
 		void draw();
+		void keyReleased(int key);
 
 		void easeAllValues();
 		void updateZValue();
@@ -27,6 +28,8 @@ class ofApp : public ofBaseApp{
 		rtlsdr_dev_t *device;
 		double phaseData[PHASE_SIZE + 2];
 		double phaseDataDifference[PHASE_SIZE];
+
+		bool showGui = true;
 
 		// mesh stuff
 		ofEasyCam cam;
